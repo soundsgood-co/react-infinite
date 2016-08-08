@@ -1,5 +1,4 @@
 *.map
-build
 coverage
 node_modules
 bower_components
@@ -8,3 +7,4 @@ examples/*.js
 .idea/
 npm-debug.log
 *.iml
+.DS_Store
