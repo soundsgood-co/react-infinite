@@ -7,6 +7,7 @@ require('./utils/establish-polyfills');
 var scaleEnum = require('./utils/scaleEnum');
 var infiniteHelpers = require('./utils/infiniteHelpers');
 var _isFinite = require('lodash.isfinite');
+var Scrollbars = require('react-custom-scrollbars').Scrollbars;
 
 var preloadType = require('./utils/types').preloadType;
 var checkProps = checkProps = require('./utils/checkProps');
@@ -174,7 +175,6 @@ var Infinite = React.createClass({
     } else {
       newProps.preloadAdditionalHeight = 0;
     }
-
     return Object.assign(oldProps, newProps);
   },
 
@@ -206,24 +206,13 @@ var Infinite = React.createClass({
       utilities.subscribeToScrollListener = () => {};
       utilities.unsubscribeFromScrollListener = () => {};
       utilities.nodeScrollListener = this.infiniteHandleScroll;
-      utilities.getScrollTop = () => {
-        var scrollable;
-        if (this.refs && this.refs.scrollable) {
-          scrollable = ReactDOM.findDOMNode(this.refs.scrollable);
-        }
-        return scrollable ? scrollable.scrollTop : 0;
-      };
-
+      utilities.getScrollTop = () => this.refs && this.refs.scrollable ? this.refs.scrollable.getScrollTop() : 0;
       utilities.setScrollTop = (top) => {
-        var scrollable;
         if (this.refs && this.refs.scrollable) {
-          scrollable = ReactDOM.findDOMNode(this.refs.scrollable);
-        }
-        if (scrollable) {
-          scrollable.scrollTop = top;
+          this.refs.scrollable.scrollTop(top);
         }
       };
-      utilities.scrollShouldBeIgnored = event => event.target !== ReactDOM.findDOMNode(this.refs.scrollable);
+      utilities.scrollShouldBeIgnored = event => event.target !== ReactDOM.findDOMNode(this.refs.scrollable).firstChild;
 
       utilities.buildScrollableStyle = () => {
         return Object.assign({}, {
@@ -450,11 +439,14 @@ var Infinite = React.createClass({
 
     // topSpacer and bottomSpacer take up the amount of space that the
     // rendered elements would have taken up otherwise
-    return <div className={this.computedProps.className}
+    return <Scrollbars className={this.computedProps.className}
                 ref="scrollable"
                 style={this.utils.buildScrollableStyle()}
                 onScroll={this.utils.nodeScrollListener}>
-      <div ref="smoothScrollingWrapper" style={infiniteScrollStyles}>
+      <div
+        ref="smoothScrollingWrapper"
+        style={infiniteScrollStyles}
+      >
         {this.computedProps.skippedChild}
         <div ref="topSpacer"
              style={this.buildHeightStyle(topSpacerHeight)}/>
@@ -464,7 +456,7 @@ var Infinite = React.createClass({
         <div ref="bottomSpacer"
              style={this.buildHeightStyle(bottomSpacerHeight)}/>
       </div>
-    </div>;
+    </Scrollbars>;
   }
 });
 

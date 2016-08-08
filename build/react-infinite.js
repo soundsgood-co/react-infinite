@@ -9,6 +9,7 @@ require('./utils/establish-polyfills');
 var scaleEnum = require('./utils/scaleEnum');
 var infiniteHelpers = require('./utils/infiniteHelpers');
 var _isFinite = require('lodash.isfinite');
+var Scrollbars = require('react-custom-scrollbars').Scrollbars;
 
 var preloadType = require('./utils/types').preloadType;
 var checkProps = checkProps = require('./utils/checkProps');
@@ -166,7 +167,6 @@ var Infinite = React.createClass({
     } else {
       newProps.preloadAdditionalHeight = 0;
     }
-
     return Object.assign(oldProps, newProps);
   },
 
@@ -207,24 +207,15 @@ var Infinite = React.createClass({
       utilities.unsubscribeFromScrollListener = function () {};
       utilities.nodeScrollListener = this.infiniteHandleScroll;
       utilities.getScrollTop = function () {
-        var scrollable;
-        if (_this.refs && _this.refs.scrollable) {
-          scrollable = ReactDOM.findDOMNode(_this.refs.scrollable);
-        }
-        return scrollable ? scrollable.scrollTop : 0;
+        return _this.refs && _this.refs.scrollable ? _this.refs.scrollable.getScrollTop() : 0;
       };
-
       utilities.setScrollTop = function (top) {
-        var scrollable;
         if (_this.refs && _this.refs.scrollable) {
-          scrollable = ReactDOM.findDOMNode(_this.refs.scrollable);
-        }
-        if (scrollable) {
-          scrollable.scrollTop = top;
+          _this.refs.scrollable.scrollTop(top);
         }
       };
       utilities.scrollShouldBeIgnored = function (event) {
-        return event.target !== ReactDOM.findDOMNode(_this.refs.scrollable);
+        return event.target !== ReactDOM.findDOMNode(_this.refs.scrollable).firstChild;
       };
 
       utilities.buildScrollableStyle = function () {
@@ -430,14 +421,17 @@ var Infinite = React.createClass({
     // topSpacer and bottomSpacer take up the amount of space that the
     // rendered elements would have taken up otherwise
     return React.createElement(
-      'div',
+      Scrollbars,
       { className: this.computedProps.className,
         ref: 'scrollable',
         style: this.utils.buildScrollableStyle(),
         onScroll: this.utils.nodeScrollListener },
       React.createElement(
         'div',
-        { ref: 'smoothScrollingWrapper', style: infiniteScrollStyles },
+        {
+          ref: 'smoothScrollingWrapper',
+          style: infiniteScrollStyles
+        },
         this.computedProps.skippedChild,
         React.createElement('div', { ref: 'topSpacer',
           style: this.buildHeightStyle(topSpacerHeight) }),

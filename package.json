@@ -83,7 +83,8 @@
   "dependencies": {
     "lodash.isarray": "3.0.4",
     "lodash.isfinite": "3.2.0",
-    "object-assign": "4.0.1"
+    "object-assign": "4.0.1",
+    "react-custom-scrollbars": "4.0.0"
   },
   "peerDependencies": {
     "react": "^15.0.0",
