@@ -4,11 +4,13 @@ function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in ob
 
 var React = global.React || require('react');
 var ReactDOM = global.ReactDOM || require('react-dom');
+var shallowCompare = global.shallowCompare || require('react-addons-shallow-compare');
 
 require('./utils/establish-polyfills');
 var scaleEnum = require('./utils/scaleEnum');
 var infiniteHelpers = require('./utils/infiniteHelpers');
 var _isFinite = require('lodash.isfinite');
+
 var Scrollbars = require('react-custom-scrollbars').Scrollbars;
 
 var preloadType = require('./utils/types').preloadType;
@@ -113,6 +115,10 @@ var Infinite = React.createClass({
     state.isScrolling = false;
 
     return state;
+  },
+
+  shouldComponentUpdate: function shouldComponentUpdate(nextProps, nextState) {
+    return shallowCompare(this, nextProps, nextState);
   },
 
   generateComputedProps: function generateComputedProps(props) {
@@ -221,8 +227,7 @@ var Infinite = React.createClass({
       utilities.buildScrollableStyle = function () {
         return Object.assign({}, {
           height: _this.computedProps.containerHeight,
-          overflowX: 'hidden',
-          overflowY: 'scroll',
+          overflow: 'hidden',
           WebkitOverflowScrolling: 'touch'
         }, _this.computedProps.styles.scrollableStyle || {});
       };
@@ -424,6 +429,7 @@ var Infinite = React.createClass({
       Scrollbars,
       { className: this.computedProps.className,
         ref: 'scrollable',
+        autoHide: true,
         style: this.utils.buildScrollableStyle(),
         onScroll: this.utils.nodeScrollListener },
       React.createElement(

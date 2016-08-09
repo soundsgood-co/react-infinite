@@ -2,11 +2,13 @@
 
 var React = global.React || require('react');
 var ReactDOM = global.ReactDOM || require('react-dom');
+var shallowCompare = global.shallowCompare || require('react-addons-shallow-compare');
 
 require('./utils/establish-polyfills');
 var scaleEnum = require('./utils/scaleEnum');
 var infiniteHelpers = require('./utils/infiniteHelpers');
 var _isFinite = require('lodash.isfinite');
+
 var Scrollbars = require('react-custom-scrollbars').Scrollbars;
 
 var preloadType = require('./utils/types').preloadType;
@@ -114,6 +116,10 @@ var Infinite = React.createClass({
     state.isScrolling = false;
 
     return state;
+  },
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return shallowCompare(this, nextProps, nextState);
   },
 
   generateComputedProps(props: ReactInfiniteProps): ReactInfiniteComputedProps {
