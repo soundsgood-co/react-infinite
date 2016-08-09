@@ -196,28 +196,40 @@ var Infinite = React.createClass({
       };
       utilities.scrollShouldBeIgnored = () => false;
       utilities.buildScrollableStyle = () => ({});
+    } else if (props.container) {
+      utilities.subscribeToScrollListener = () => {
+        props.setScrollHandler(this.infiniteHandleScroll);
+      };
+      utilities.unsubscribeFromScrollListener = () => {
+        props.removeScrollHandler(this.infiniteHandleScroll);
+      };
+      utilities.nodeScrollListener = () => {};
+      utilities.getScrollTop = props.getScrollTop;
+      utilities.setScrollTop = props.setScrollTop;
+      utilities.scrollShouldBeIgnored = props.scrollShouldBeIgnored || () => false;
+      utilities.buildScrollableStyle = () => ({});
     } else {
       utilities.subscribeToScrollListener = () => {};
       utilities.unsubscribeFromScrollListener = () => {};
       utilities.nodeScrollListener = this.infiniteHandleScroll;
       utilities.getScrollTop = () => {
-        var scrollable;
-        if (this.refs && this.refs.scrollable) {
-          scrollable = ReactDOM.findDOMNode(this.refs.scrollable);
+        var scrollable = this.getScrollable();
+        if (this.getScrollable()) {
+          scrollable = ReactDOM.findDOMNode(this.getScrollable());
         }
         return scrollable ? scrollable.scrollTop : 0;
       };
 
       utilities.setScrollTop = (top) => {
         var scrollable;
-        if (this.refs && this.refs.scrollable) {
-          scrollable = ReactDOM.findDOMNode(this.refs.scrollable);
+        if (this.getScrollable()) {
+          scrollable = ReactDOM.findDOMNode(this.getScrollable());
         }
         if (scrollable) {
           scrollable.scrollTop = top;
         }
       };
-      utilities.scrollShouldBeIgnored = event => event.target !== ReactDOM.findDOMNode(this.refs.scrollable);
+      utilities.scrollShouldBeIgnored = event => event.target !== ReactDOM.findDOMNode(this.getScrollable());
 
       utilities.buildScrollableStyle = () => {
         return Object.assign({}, {
@@ -229,6 +241,13 @@ var Infinite = React.createClass({
       };
     }
     return utilities;
+  },
+
+  getScrollable() {
+    if (this.props.container) {
+      return this.props.container();
+    }
+    return this.refs && this.refs.scrollable;
   },
 
   recomputeInternalStateFromProps(props: ReactInfiniteProps): {
@@ -334,7 +353,7 @@ var Infinite = React.createClass({
     if (this.utils.scrollShouldBeIgnored(e)) {
       return;
     }
-    this.computedProps.handleScroll(ReactDOM.findDOMNode(this.refs.scrollable));
+    this.computedProps.handleScroll(ReactDOM.findDOMNode(this.getScrollable()));
     this.handleScroll(this.utils.getScrollTop());
   },
 
