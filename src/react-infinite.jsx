@@ -440,6 +440,7 @@ var Infinite = React.createClass({
     // rendered elements would have taken up otherwise
     return <Scrollbars className={this.computedProps.className}
                 ref="scrollable"
+                autoHide
                 style={this.utils.buildScrollableStyle()}
                 onScroll={this.utils.nodeScrollListener}>
       <div
